@@ -6,6 +6,7 @@ date: "Data Science PWT Meeting <br> May 12, 2022"
 output:
   xaringan::moon_reader:
     lib_dir: libs
+    css: [default, metropolis, metropolis-fonts, "css/custom.css"]
     nature:
       highlightStyle: github
       highlightLines: true
@@ -24,7 +25,7 @@ San Francisco Estuary Institute's (SFEI) HAB Satellite Analysis Tool: <https://f
 
 Provides CyanoHAB abundance estimates for all of California using a Cyanobacteria Index (CI)
 
-```{r print sfei image, echo = FALSE}
+```{r print sfei image, echo = FALSE, out.width = '80%', fig.align = 'center'}
 knitr::include_graphics("images/SFEI_HAB_Satellite_Tool.jpg")
 ```
 
@@ -33,22 +34,19 @@ knitr::include_graphics("images/SFEI_HAB_Satellite_Tool.jpg")
 # Objective
 
 - Pull out raster pixels of Cyanobacteria Index (CI) for four open water regions in the SF Estuary:
+  
   - Liberty Island
   - Franks Tract
   - Mildred Island
   - Clifton Court Forebay
 
+--
 
 - Count the number of pixels in each region that fall within four CI categories (Low, Moderate, High, Very High) and two additional categories (Non-detect, Invalid or Missing)
 
+--
+
 - Repeat this procedure for every day with valid imagery between May-October in years 2020 and 2021
-
----
-class: inverse, middle
-
-# Simple Example
-
-Download and process a single raster file
 
 ---
 
@@ -61,6 +59,13 @@ Download and process a single raster file
 - `sf` - importing, visualizing, and working with spatial data (polygons)
 
 - `tidyverse` - general data manipulation and visualizing
+
+---
+class: inverse, middle
+
+# Simple Example
+
+Download and process a single raster file
 
 ---
 
@@ -89,7 +94,7 @@ strs_hab_sat
 library(dplyr)
 
 # Convert pixel attributes from factor to numeric
-strs_hab_sat_c <- strs_hab_sat %>% 
+strs_hab_sat_c <- strs_hab_sat %>%
   mutate(
     across(everything(), ~ as.numeric(as.character(.x)))
   )
@@ -102,23 +107,29 @@ strs_hab_sat_c
 # What does it look like?
 
 .pull-left[
-#### Code:
+.small[
 ```{r plot stars code right, fig.show = 'hide'}
 library(ggplot2)
 library(sf)
 
 # Import CA boundary shapefile
-sf_ca_bound <- 
-  read_sf("spatial_data/CA_State_TIGER2016.shp") %>% 
+sf_ca_bound <-
+  read_sf("spatial_data/CA_State_TIGER2016.shp") %>%
   st_transform(crs = st_crs(strs_hab_sat_c))
 
 # Plot satellite data
-ggplot() + 
+ggplot() +
   geom_stars(data = strs_hab_sat_c) +
   scale_fill_viridis_b(name ="Cyano Index") +
-  geom_sf(data = sf_ca_bound, alpha = 0, color = "black", size = 1) +
+  geom_sf(
+    data = sf_ca_bound,
+    alpha = 0,
+    color = "black",
+    size = 1
+  ) +
   theme_bw()
 ```
+]
 ]
 
 .pull-right[
@@ -132,3 +143,4 @@ ggplot() +
 # Crop raster using a bounding box
 
 
+---
